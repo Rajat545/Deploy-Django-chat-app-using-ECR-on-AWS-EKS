@@ -1,3 +1,4 @@
+
 # Deploy Django ChatProject using AWS ECR to AWS EKS(K8s).
 
 This is a simple Django 3.0+ project, implements Channels to deal with this simple Chat App 
@@ -37,7 +38,9 @@ Clone your forked repository to your local machine:
 
 # Step 3: Build Docker Image
 
-  `docker build -t chatproject:latest .`
+  `
+  docker build -t chatproject:latest .
+  `
 
 # Step 4: Run Docker Container
 
@@ -54,15 +57,22 @@ Clone your forked repository to your local machine:
 # Step 7: Install AWS CLI v2
 
  `curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"`
+
   `sudo apt install unzip`
+
   `unzip awscliv2.zip`
+
   `sudo ./aws/install -i /usr/local/aws-cli -b /usr/local/bin --update`
+
   `aws configure`
 
 # Step 8: Install Docker on ec2
  `sudo apt-get update`
+
   `sudo apt install docker.io`
+
   `docker ps`
+
   `sudo chown $USER /var/run/docker.sock`
 
 # Step 9: Navigate to Amazon ECR
@@ -88,43 +98,69 @@ Clone your forked repository to your local machine:
   `docker tag chatprojecct:latest your-account-id.dkr.ecr.your-region.amazonaws.com/chatproject:latest`
 
   Push the tagged image to ECR:
+
    `docker push your-account-id.dkr.ecr.your-region.amazonaws.com/chatproject:latest`
 
 # Step 13: Install kubectl
-  `curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl`
+
+`curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl`
+
   `chmod +x ./kubectl`
+
   `sudo mv ./kubectl /usr/local/bin`
+
   `kubectl version --short --client`
 
 # Step 14: Install eksctl
+
   `curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp`
+
   `sudo mv /tmp/eksctl /usr/local/bin`
+
   `eksctl version`
 
 # Step 15: Setup EKS Cluster
+
   `eksctl create cluster --name chatproject --region us-west-2 --node-type t2.medium --nodes-min 1 --nodes-max 1`
+
   `aws eks update-kubeconfig --region us-west-2 --name chatproject`
+
  `` kubectl get nodes``
 
 # Step 16: Run Manifests
+
  ``kubectl create namespace chat``
+
  ``kubectl config set-context --current --namespace chat``
+
  ``kubectl apply -f .``
+
  ``kubectl delete -f .``
 
 # Step 17: Install AWS Load Balancer
+
 `` `curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json``
+
  ``aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json``
+
  ``eksctl utils associate-iam-oidc-provider --region=us-west-2 --cluster=three-tier-cluster --approve``
+
  ``eksctl create iamserviceaccount --cluster=chatproject --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::"your aws iam no.":policy/AWSLoadBalancerControllerIAMPolicy --approve --region=us-west-2``
 
 # Step 18: Deploy AWS Load Balancer Controller
+
  ``sudo snap install helm --classic``
+
  ``helm repo add eks https://aws.github.io/eks-charts``
+
  ``helm repo update eks``
- ``helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=chatproject --set serviceAccount.create=false --set serviceAccount.`name=aws-load-balancer-controller``
+
+ ``helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=chatproject --set serviceAccount.create=false --set serviceAccountname=aws-load-balancer-controller``
+
  ``kubectl get deployment -n kube-system aws-load-balancer-controller``
+
  ``kubectl apply -f app_lb.yaml``
+
 `` kubectl get ing -n chatproject``
 
   you will see your host name and address connect to DNS servers and update your domain in deployment.yaml and app_lb.yaml files.
@@ -132,7 +168,8 @@ Clone your forked repository to your local machine:
 
  # Cleanup
 
-  To delete the EKS cluster:
+  To delete the EKS cluster: 
+  
   ``eksctl delete cluster --name chatproject --region us-west-2``
 
 # Contribution Guidelines
@@ -162,3 +199,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
