@@ -25,11 +25,11 @@ Clone your forked repository to your local machine:
 
  Navigate to the root directory of the cloned repository:
 
-  `cd chatproject``
+  `cd chatproject`
 
  Create a new file named Dockerfile:
 
-  `vim Dockerfile``
+  `vim Dockerfile`
 
  Open Dockerfile using a text editor and add the content from the above provided Dockerfile.
 
@@ -37,11 +37,11 @@ Clone your forked repository to your local machine:
 
 # Step 3: Build Docker Image
 
-  `docker build -t chatproject:latest .``
+  `docker build -t chatproject:latest .`
 
 # Step 4: Run Docker Container
 
-  `docker run -p 8000:8000 chatproject:latest```
+  `docker run -p 8000:8000 chatproject:latest`
 
 # Step 5: IAM Configuration
   Create a user eks-admin with AdministratorAccess.
@@ -52,17 +52,18 @@ Clone your forked repository to your local machine:
   SSH into the instance from your local machine.
 
 # Step 7: Install AWS CLI v2
-  `curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  sudo apt install unzip
-  unzip awscliv2.zip
-  sudo ./aws/install -i /usr/local/aws-cli -b /usr/local/bin --update
-  aws configure``
+
+ `curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"`
+  `sudo apt install unzip`
+  `unzip awscliv2.zip`
+  `sudo ./aws/install -i /usr/local/aws-cli -b /usr/local/bin --update`
+  `aws configure`
 
 # Step 8: Install Docker on ec2
- `` sudo apt-get update
-  sudo apt install docker.io
-  docker ps
-  sudo chown $USER /var/run/docker.sock``
+ `sudo apt-get update`
+  `sudo apt install docker.io`
+  `docker ps`
+  `sudo chown $USER /var/run/docker.sock`
 
 # Step 9: Navigate to Amazon ECR
    In the AWS Management Console, search for "ECR" or navigate to the "Services" dropdown, find "ECR" under "Containers," and click on it.
@@ -79,52 +80,52 @@ Clone your forked repository to your local machine:
 
     Copy and run the displayed commands in your terminal to authenticate Docker. This involves using the AWS CLI and executing the docker login command with the provided credentials.
    
-   `aws ecr get-login-password --region your-region | docker login --username AWS --password-stdin your-account-id.dkr.ecr.your-region.amazonaws.com``
+   `aws ecr get-login-password --region your-region | docker login --username AWS --password-stdin your-account-id.dkr.ecr.your-region.amazonaws.com`
 
 # Step 12: Push Docker Image to ECR
   Assuming you've built a Docker image locally (e.g., using a Dockerfile), tag your local image with the ECR repository URI.
   
-  `docker tag chatprojecct:latest your-account-id.dkr.ecr.your-region.amazonaws.com/chatproject:latest``
+  `docker tag chatprojecct:latest your-account-id.dkr.ecr.your-region.amazonaws.com/chatproject:latest`
 
   Push the tagged image to ECR:
-   `docker push your-account-id.dkr.ecr.your-region.amazonaws.com/chatproject:latest``
+   `docker push your-account-id.dkr.ecr.your-region.amazonaws.com/chatproject:latest`
 
 # Step 13: Install kubectl
-  `curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
-  chmod +x ./kubectl
-  sudo mv ./kubectl /usr/local/bin
-  kubectl version --short --client``
+  `curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl`
+  `chmod +x ./kubectl`
+  `sudo mv ./kubectl /usr/local/bin`
+  `kubectl version --short --client`
 
 # Step 14: Install eksctl
-  `curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-  sudo mv /tmp/eksctl /usr/local/bin
-  eksctl version``
+  `curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp`
+  `sudo mv /tmp/eksctl /usr/local/bin`
+  `eksctl version`
 
 # Step 15: Setup EKS Cluster
-  `eksctl create cluster --name chatproject --region us-west-2 --node-type t2.medium --nodes-min 1 --nodes-max 1
-  aws eks update-kubeconfig --region us-west-2 --name chatproject
-  kubectl get nodes``
+  `eksctl create cluster --name chatproject --region us-west-2 --node-type t2.medium --nodes-min 1 --nodes-max 1`
+  `aws eks update-kubeconfig --region us-west-2 --name chatproject`
+ `` kubectl get nodes``
 
 # Step 16: Run Manifests
- `kubectl create namespace chat
- kubectl config set-context --current --namespace chat
- kubectl apply -f .
- kubectl delete -f .``
+ ``kubectl create namespace chat``
+ ``kubectl config set-context --current --namespace chat``
+ ``kubectl apply -f .``
+ ``kubectl delete -f .``
 
 # Step 17: Install AWS Load Balancer
- `curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json
- aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json
- eksctl utils associate-iam-oidc-provider --region=us-west-2 --cluster=three-tier-cluster --approve
- eksctl create iamserviceaccount --cluster=chatproject --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::"your aws iam no.":policy/AWSLoadBalancerControllerIAMPolicy --approve --region=us-west-2``
+`` `curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json``
+ ``aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json``
+ ``eksctl utils associate-iam-oidc-provider --region=us-west-2 --cluster=three-tier-cluster --approve``
+ ``eksctl create iamserviceaccount --cluster=chatproject --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::"your aws iam no.":policy/AWSLoadBalancerControllerIAMPolicy --approve --region=us-west-2``
 
 # Step 18: Deploy AWS Load Balancer Controller
- `sudo snap install helm --classic
- helm repo add eks https://aws.github.io/eks-charts
- helm repo update eks
- helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=chatproject --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller
- kubectl get deployment -n kube-system aws-load-balancer-controller
- kubectl apply -f app_lb.yaml
- kubectl get ing -n chatproject``
+ ``sudo snap install helm --classic``
+ ``helm repo add eks https://aws.github.io/eks-charts``
+ ``helm repo update eks``
+ ``helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=chatproject --set serviceAccount.create=false --set serviceAccount.`name=aws-load-balancer-controller``
+ ``kubectl get deployment -n kube-system aws-load-balancer-controller``
+ ``kubectl apply -f app_lb.yaml``
+`` kubectl get ing -n chatproject``
 
   you will see your host name and address connect to DNS servers and update your domain in deployment.yaml and app_lb.yaml files.
 
@@ -132,7 +133,7 @@ Clone your forked repository to your local machine:
  # Cleanup
 
   To delete the EKS cluster:
-  `eksctl delete cluster --name chatproject --region us-west-2``
+  ``eksctl delete cluster --name chatproject --region us-west-2``
 
 # Contribution Guidelines
  Fork the repository and create your feature branch.
