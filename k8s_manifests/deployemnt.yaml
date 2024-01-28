@@ -1,0 +1,30 @@
+# local-deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: chat
+  labels:
+    role: frontend
+    env: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: frontend
+  template:
+    metadata:
+      labels:
+        role: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: your-django-app-image:latest
+        imagePullPolicy: Always
+        env:
+          - name: DJANGO_APP_BACKEND_URL
+            value: "http://localhost:8000/api/tasks"  # Update the URL accordingly
+        ports:
+        - containerPort: 8000  # Update the port if your Django app uses a different port
+
